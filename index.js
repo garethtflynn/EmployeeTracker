@@ -58,20 +58,29 @@ function firstPrompt () {
         if (answers.firstPrompt === 'update an employee role'){
             updateEmp ()
         }
-    }
+    })
 }
 
+let allDeps = []
 function viewDeps () {
+    db.query('SELECT * FROM department',function (err, result) {
+        if (err) {
+            console.log(err)
+        }
+        console.log(result)
+    }
+)};
 
-}
-
+let allRoles = []
 function viewRoles () {
 
 }
 
+let allEmps = []
 function viewEmps () {
 
 }
+
 
 function addDep () {
     inquirer.prompt ([
@@ -83,6 +92,7 @@ function addDep () {
     ])
 
 }
+
 
 function addRole () {
     inquirer.prompt ([
