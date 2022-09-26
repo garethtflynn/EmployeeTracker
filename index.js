@@ -7,7 +7,7 @@ const db  = mysql.createConnection(
         host: 'localhost',
         user:'root',
         password:'root',
-        database:'employees_db'
+        database:'employee_db'
     },
     console.log('Connected to the employees_db database!')
 )
@@ -63,22 +63,41 @@ function firstPrompt () {
 
 let allDeps = []
 function viewDeps () {
-    db.query('SELECT * FROM department',function (err, result) {
-        if (err) {
-            console.log(err)
-        }
-        console.log(result)
-    }
-)};
+    db.query('SELECT * FROM department', function (err, res) {
+        if (err) 
+            throw err
+        for (i = 0; i <= allDeps.length; i++) {
+            allDeps.push(res[i].depName)
+        }    
+    })
+    console.table(res)
+    firstPrompt ()
+};
 
 let allRoles = []
 function viewRoles () {
-
+    db.query('SELECT * FROM roles',function (err, res) {
+        if (err) 
+            throw err
+        for (i = 0; i <= allRoles.length; i++) {
+            allRoles.push(res[i].title)
+        }    
+    })
+    console.table(res)
+    firstPrompt ()
 }
 
 let allEmps = []
 function viewEmps () {
-
+    db.query('SELECT * FROM employees',function (err, res) {
+        if (err) 
+            throw err
+        for (i = 0; i <= allEmps.length; i++) {
+            allEmps.push(res[i].title)
+        }    
+    })
+    console.table(res)
+    firstPrompt()
 }
 
 
@@ -87,10 +106,14 @@ function addDep () {
         {
             type: 'input',
             message: 'What is the name of the department?',
-            name: 'department'
+            name: 'depAdded'
         }
-    ])
-
+    ]).then((answers) => {
+        db.query(`INSERT INTO department (depName)
+        VALUES ('${answers.depAdded}')`)
+    })
+    console.log('department added succesfully!')
+    firstPrompt ()
 }
 
 
@@ -107,15 +130,21 @@ function addRole () {
             name: 'salaryAdded'
         },
         {
-            type: 'input',
+            type: 'list',
             message: 'what department is this role in?',
-            name: 'depRole'
+            name: 'depRole',
+            choices: ''
         },
-
-    ])
-
-
+    ]).then((answers) => {
+        db.query(`INSERT INTO role (title, salary, department_id)
+        VALUES  ('${answers.roleAdded}'),
+                ('${answers.salaryAdded}'),
+                ('${allDeps.indexOf(answers.depRole)}');`)
+    })
+    console.log('role added succesfully!')
+    firstPrompt ()
 }
+
 
 function addEmp () {
     inquirer.prompt([
@@ -131,13 +160,39 @@ function addEmp () {
         },
         {
             type: 'input',
-            message: `who is the employee's manager?`,
-            name: 'empManager'
+            message: `what is this employee's role?`,
+            name: 'role'
         },
-    ])    
-
-}
+        {
+            type: 'list',
+            message: `who is the employee's manager?`,
+            name: 'empManager',
+            choices: 
+        }
+    ]).then((answers) => {
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)
+        VALUES  ('${answers.firsName}'),
+                ('${answers.lastName}'),
+                ('${answers.role}'),
+                ('${answers.empManager}');`)
+    })
+    console.log('employee added succesfully!')
+    firstPrompt ()
+} 
 
 function updateEmp () {
-
+    inquirer.prompt([
+        {
+            type: 'list',
+            message: `Which Employee would you like to update?`,
+            name: 'empName',
+            choices: viewEmps ()
+        },
+        {
+            type: 'list',
+            message: `What role would you like to give them?`,
+            name: 'empRole',
+            choices: viewRoles ()
+        }
+    ]).then
 }
