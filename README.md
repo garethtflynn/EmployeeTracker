@@ -15,7 +15,7 @@ The purpose of this command line application is to be able to view and manage de
   * [Tests](#tests)
   * [Questions](#questions)
   * [Credits](#credits)
-  * [Link](#link)
+  * [Links](#links)
 
 ## Installation 
 

@@ -26,3 +26,7 @@ values  ('Don', 'Draper', 1,  NULL),
         ('Tommy', 'Shelby', 6, 5),
         ('Barney', 'Stinson', 7, NULL),
         ('Marshall', 'Ericson', 8, 7); 
+
+SELECT * FROM departments;
+SELECT * FROM roles;
+SELECT * FROM employees;

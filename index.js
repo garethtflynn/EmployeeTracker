@@ -2,22 +2,29 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const consTable = require("console.table");
 
-const db = mysql.createConnection(
-  {
-    host: "localhost",
-    user: "root",
-    password: "root",
-    database: "employee_db",
-  },
-  console.log("Connected to the employees_db database!")
-);
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: "employee_db",
+});
 
 db.connect((err) => {
   if (err) throw err;
-  console.log("There was an error connecting to employee_db database!");
-
-  firstPrompt();
+  console.log("Connected to the employees_db database!");
+  showConnection();
 });
+
+function showConnection() {
+  console.log("===========================");
+  console.log("||                       ||");
+  console.log("||     EMPLOYEE MANAGER  ||");
+  console.log("||                       ||");
+  console.log("===========================");
+  pickEmps();
+  console.log(allemps);
+  firstPrompt();
+}
 
 function firstPrompt() {
   inquirer
@@ -34,6 +41,7 @@ function firstPrompt() {
           "add a role",
           "add an employee",
           "update an employee role",
+          "im done organizing my company",
         ],
       },
     ])
@@ -59,56 +67,61 @@ function firstPrompt() {
       if (answers.firstPrompt === "update an employee role") {
         updateEmp();
       }
+      if (answers.firstPrompt === "im done organizing my company") {
+        return;
+      }
     });
 }
 
-let allDeps = [];
+let alldeps = [];
 function pickDeps() {
   db.query("SELECT * FROM departments", function (err, res) {
-    if (err) throw err;
-    for (i = 0; i <= res.length; i++) {
-      allDeps.push(res[i].depName);
+    if (err) throw err
+    for (var i = 0; i < res.length; i++) {
+      alldeps.push(res[i].depName);
     }
-  });
-  return allDeps;
+  })
+  return alldeps;
 }
 
-let allRoles = [];
+
+let allroles = [];
 function pickRoles() {
   db.query("SELECT * FROM roles", function (err, res) {
     if (err) throw err;
-    for (i = 0; i <= res.length; i++) {
-      allRoles.push(res[i].title);
+    for (var i = 0; i < res.length; i++) {
+      allroles.push(res[i].title)
     }
-  });
-  return allRoles;
+  })
+  return allroles;
 }
 
-let allEmps = [];
+let allemps = [];
 function pickEmps() {
   db.query("SELECT * FROM employees", function (err, res) {
     if (err) throw err;
-    for (i = 0; i <= res.length; i++) {
-      allEmps.push(res[i].firstName);
+    for (let i = 0; i < res.length; i++) {
+      allemps.push(res[i].first_name);
     }
   });
-  return allEmps;
+  return allemps;
 }
 
-let manList = [];
+let managerlist = [];
 function pickMan() {
   db.query(
     `SELECT * from employees WHERE manager_id = NULL`,
     function (err, res) {
       if (err) throw err;
-      for (i = 0; i <= res.length; i++) {
-        manList.push(res[i].firstName);
+      for (i = 0; i < res.length; i++) {
+        managerlist.push(res[i].first_name)
       }
     }
-  );
-  return manList;
+  )
+  return managerlist;
 }
 
+// functions that add department, role, and employees
 function addDep() {
   inquirer
     .prompt([
@@ -125,9 +138,9 @@ function addDep() {
           if (err) throw err;
           firstPrompt();
         };
+      console.log("department added succesfully!");
+      firstPrompt();
     });
-  console.log("department added succesfully!");
-  firstPrompt();
 }
 
 function addRole() {
@@ -154,12 +167,17 @@ function addRole() {
       db.query(`INSERT INTO roles (title, salary, department_id)
         VALUES  ('${answers.roleAdded}',
                 '${answers.salaryAdded}',
-                '${allDeps.indexOf(answers.depRole) + 1}');`);
+                '${alldeps.indexOf(answers.depRole) + 1}');`),
+        function (err) {
+          if (err) throw err;
+          firstPrompt();
+        };
+      console.log("role added succesfully!");
+      firstPrompt();
     });
-  console.log("role added succesfully!");
-  firstPrompt();
 }
 
+// fix this
 function addEmp() {
   inquirer
     .prompt([
@@ -174,7 +192,7 @@ function addEmp() {
         name: "lastName",
       },
       {
-        type: "input",
+        type: "list",
         message: `what is this employee's role?`,
         name: "role",
         choices: pickRoles(),
@@ -190,17 +208,18 @@ function addEmp() {
       db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id)
         VALUES  ('${answers.firsName}',
                 '${answers.lastName}',
-                '${allRoles.indexOf(answers.roles) + 1}',
-                '${manList.indexOf(answers.empManager)}');`),
+                '${allroles.indexOf(answers.roles) + 1}',
+                '${managerlist.indexOf(answers.empManager)}');`),
         function (err) {
           if (err) throw err;
           firstPrompt();
         };
+      console.log("employee added succesfully!")
+      firstPrompt()
     });
-  console.log("employee added succesfully!");
-  firstPrompt();
 }
 
+// functions that view all departments, roles, and employees
 function viewDeps() {
   db.query(`SELECT * FROM departments`, function (err, res) {
     if (err) throw err;
@@ -218,11 +237,14 @@ function viewRoles() {
 }
 
 function viewEmps() {
-  db.query(`SELECT employees.id, employees.first_name, employees.last_namem, employees.manager_id,   roles.title, roles.departmebnt_id, roles.salary, FROM employees JOIN roles ON employees.role_id = roles.id`, function (err, res) {
-    if (err) throw err;
-    console.table(res);
-    firstPrompt();
-  });
+  db.query(
+    `SELECT employees.id, employees.first_name, employees.last_name, employees.manager_id, roles.title, roles.department_id, roles.salary FROM employees JOIN roles ON employees.role_id = roles.id`,
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      firstPrompt();
+    }
+  );
 }
 
 function updateEmp() {
@@ -230,24 +252,29 @@ function updateEmp() {
     .prompt([
       {
         type: "list",
-        message: `Which Employee would you like to update?`,
-        name: "empName",
+        message: "Which employee you would like to update?",
+        name: "emp_name",
         choices: pickEmps(),
       },
       {
         type: "list",
-        message: `What role would you like to give them?`,
-        name: "empRole",
+        message: "What role would you like to give them?",
+        name: "emp_role",
         choices: pickRoles(),
       },
     ])
     .then((answers) => {
-      db.query(`UPDATE employees SET role_id = '${answers.empRole}' WHERE role_id = ${answers.empName}`), function (err) {
-        if (err) throw err;
-        console.log(err);
-        firstPrompt();
-      };
-      console.log('employee updated!')
-      firstPrompt ()
+      db.query(
+        `UPDATE employees SET role_id = ${
+          allroles.indexOf(answers.emp_role) + 1
+        } WHERE employees.id = ${allemps.indexOf(answers.emp_name) + 1}`
+      ),
+        function (err) {
+          if (err) throw err;
+          console.log(err);
+          firstPrompt();
+        };
+      console.log("Employee Role Changed Successfully");
+      firstPrompt();
     });
 }
