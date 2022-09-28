@@ -1,11 +1,11 @@
-INSERT INTO department  (depName)
+INSERT INTO departments  (depName)
 values  ('marketing'),
         ('finance'),
         ('sales'),
         ('engineering');
 
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO roles (title, salary, department_id)
 values  ('Creative Director', 80000, 1),
         ('Social Media Specialist', 50000, 1),
         ('Senior Developer', 150000, 4),
@@ -17,7 +17,7 @@ values  ('Creative Director', 80000, 1),
     
         
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
 values  ('Don', 'Draper', 1,  NULL),
         ('Peggy', 'Olson', 2, 1),
         ('Elliot', 'Alderson', 3, NULL),
