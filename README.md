@@ -23,7 +23,7 @@ In order to use this application, the user must first install the Node Package M
 
 ## Screenshots/Visuals
 
-![App Screenshot]()
+![App Screenshot](./assets/employeeTracker.png)
 
 ## Technology
 
@@ -56,4 +56,4 @@ If you have any questions please email me at gareth.t.flynn@gmail.com
 ## Links  
 
 * [Repository](https://github.com/garethtflynn/EmployeeTracker)
-* [Video]()
+* [Video](https://drive.google.com/file/d/1Zg4cLM0TlpiF1FVHMk9yNGwIGyRW3R5J/view)
