@@ -16,11 +16,11 @@ db.connect((err) => {
 });
 
 function showConnection() {
-  console.log("===========================");
-  console.log("||                       ||");
-  console.log("||     EMPLOYEE MANAGER  ||");
-  console.log("||                       ||");
-  console.log("===========================");
+  console.log("=======================");
+  console.log("|                     |");
+  console.log("|   EMPLOYEE TRACKER  |");
+  console.log("|                     |");
+  console.log("=======================");
   pickEmps();
   console.log(allemps);
   firstPrompt();
@@ -107,17 +107,17 @@ function pickEmps() {
   return allemps;
 }
 
-let managerlist = [];
+let managerlist = ['NULL'];
 function pickMan() {
   db.query(
-    `SELECT * from employees WHERE manager_id = NULL`,
+    'SELECT * FROM employees WHERE manager_id IS NULL;',
     function (err, res) {
       if (err) throw err;
-      for (i = 0; i < res.length; i++) {
-        managerlist.push(res[i].first_name)
+      for (let i = 0; i < res.length; i++) {
+        managerlist.push(res[i].first_name);
       }
     }
-  )
+  );
   return managerlist;
 }
 
@@ -149,12 +149,12 @@ function addRole() {
       {
         type: "input",
         message: "what is the name of the role?",
-        name: "roleName",
+        name: "roleAdded",
       },
       {
         type: "input",
         message: "what is the salary of this role?",
-        name: "roleSalary",
+        name: "salaryAdded",
       },
       {
         type: "list",
@@ -194,25 +194,21 @@ function addEmp() {
       {
         type: "list",
         message: `what is this employee's role?`,
-        name: "role",
+        name: "roles",
         choices: pickRoles(),
       },
       {
         type: "list",
         message: `who is the employee's manager?`,
         name: "empManager",
-        choices: pickMan(),
-      },
+        choices: pickMan() 
+      }
     ])
     .then((answers) => {
-      db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id)
-        VALUES  ('${answers.firsName}',
-                '${answers.lastName}',
-                '${allroles.indexOf(answers.roles) + 1}',
-                '${managerlist.indexOf(answers.empManager)}');`),
+      db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES  ('${answers.firstName}','${answers.lastName}','${allroles.indexOf(answers.roles) + 1}','${managerlist.indexOf(answers.empManager)}');`),
         function (err) {
-          if (err) throw err;
-          firstPrompt();
+          if (err) throw err
+          firstPrompt()
         };
       console.log("employee added succesfully!")
       firstPrompt()
